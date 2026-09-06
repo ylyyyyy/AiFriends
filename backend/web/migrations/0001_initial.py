@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
                     "photo",
                     models.ImageField(
                         default="user/photos/default.png",
-                        upload_to=web.models.user.photo_upoload_to,
+                        upload_to=web.models.user.photo_upload_to,
                     ),
                 ),
                 ("profile", models.TextField(default="谢谢你的关注", max_length=500)),
