@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate, aget_user
+from django.contrib.auth import authenticate
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -17,7 +17,7 @@ class LoginView(APIView):
                 })
             user = authenticate(username=username,password=password )
             if user :
-                user_profile = UserProfile.objects.get(username=username)
+                user_profile = UserProfile.objects.get(user=user)
                 refresh = RefreshToken.for_user(user)   # 生成jwt
                 response = Response({
                     'result':'success',
@@ -25,7 +25,7 @@ class LoginView(APIView):
                     'username':user.username,
                     'photo':user_profile.photo.url,
                     'profile':user_profile.profile,
-
+                    'user_id': user.id,
                 })
                 response.set_cookie(
                     key= 'refresh_token',

@@ -3,11 +3,29 @@ import {useUserStore} from "@/stores/user.js";
 import UserSpaceIcon from "@/components/navbar/icons/UserSpaceIcon.vue";
 import UserProfileIcon from "@/components/navbar/icons/UserProfileIcon.vue";
 import UserLogoutIcon from "@/components/navbar/icons/UserLogoutIcon.vue";
+import {useRouter} from "vue-router";
+import api from "@/js/http/api.js";
+
 
 const user = useUserStore()
+const router = useRouter()
+
 function closeMenu() {
   const element = document.activeElement
   if (element && element instanceof HTMLElement) element.blur()
+}
+async function hendleLogout(){
+  try{
+    const res = await api.post('api/user/account/logout')
+    if (res.data.result === 'success'){
+      user.logout()
+      await router.push({
+        name:'homepage-index'
+      })
+    }
+  }catch (err){
+    console.log(err)
+  }
 }
 </script>
 
@@ -20,7 +38,7 @@ function closeMenu() {
     </div>
     <ul tabindex="-1" class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-lg">
       <li>
-        <RouterLink  @click="closeMenu" :to="{name: 'user-space-index',params:{user_id:user.id}}">
+        <RouterLink @click="closeMenu" :to="{name: 'user-space-index',params:{user_id:user.id}}">
           <div class="avatar">
             <div class="w-10 rounded-full">
               <img :src="user.photo" clt="">
@@ -43,7 +61,7 @@ function closeMenu() {
       </li>
       <li/>
       <li>
-        <a @click="closeMenu" class="text-sm font-bold py-3">
+        <a @click="hendleLogout" class="text-sm font-bold py-3">
           <UserLogoutIcon/>
           退出登录
         </a>
