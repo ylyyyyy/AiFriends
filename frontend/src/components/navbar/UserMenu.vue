@@ -24,7 +24,7 @@ async function hendleLogout(){
       })
     }
   }catch (err){
-    console.log(err)
+
   }
 }
 </script>
