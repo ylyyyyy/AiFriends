@@ -41,6 +41,6 @@ class UpdateCharacterView(APIView):
             })
 
         except:
-            Response({
+            return Response({
                 'result':'系统异常，请重试'
             })
