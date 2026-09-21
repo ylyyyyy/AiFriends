@@ -67,7 +67,7 @@ defineExpose({
 </script>
 
 <template>
-  <fielset class="fieldset">
+  <fieldset class="fieldset">
     <label class="label text-base">聊天背景</label>
     <div class="avatar relative">
       <div v-if="myBackgroundImage" class="w-15 h-25 rounded-box">
@@ -78,7 +78,7 @@ defineExpose({
         <CameraIcon/>
       </div>
     </div>
-  </fielset>
+  </fieldset>
   <input ref="file-input-ref" type="file" class="hidden" accept="image/*" @change="onFileChange">
 
   <dialog ref="modal-ref" class="modal">

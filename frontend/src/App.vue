@@ -17,7 +17,7 @@ onMounted(async () => {
       user.setUserInfo(data)
     }
   }catch (err){
-    console.log(err)
+
   } finally {
     user.setHasPulldeUserInfo(true)
 
