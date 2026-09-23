@@ -4,6 +4,7 @@ import UserInfoField from "@/views/user/space/components/UserInfoField.vue";
 import {nextTick, onMounted, ref, useTemplateRef, onBeforeUnmount} from "vue";
 import {useRoute} from "vue-router";
 import api from "@/js/http/api.js";
+import Character from "@/components/character/Character.vue";
 
 const userProfile = ref(null)
 const characters = ref([])
@@ -32,12 +33,13 @@ async function loadMore(){
       }
     })
     const data = res.data
+
     if( data.result === 'success'){
       userProfile.value = data.user_profile
       newCharacters = data.characters
     }
   }catch (err){
-    console.log(err)
+
   } finally {
     isLoading.value = false
     if(newCharacters.length === 0){
@@ -70,6 +72,10 @@ onMounted( async () => {
   observer.observe(sentinelRef.value)
 })
 
+function removeCharacter(characterId){
+  characters.value = characters.value.filter(c => c.id !==characterId)
+}
+
 onBeforeUnmount( () => {
   observer?.disconnect()
 })
@@ -77,11 +83,17 @@ onBeforeUnmount( () => {
 
 <template>
   <div class="flex flex-col items-center mb-12">
-    <UserInfoField v-if="userProfile" :userProfile="userProfile"/>
+    <UserInfoField  :userProfile="userProfile"/>
     <div class="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-9 mt-12 justify-items-center w-full px-9">
-
+      <Character
+        v-for="character in characters"
+        :key="character.id"
+        :character="character"
+        :canEdit="true"
+        @remove="removeCharacter"
+      />
     </div>
-    <div ref="sentinel-ref" class="h-2 mt-8 w-100 bg-red-500"></div>
+    <div ref="sentinel-ref" class="h-2 mt-8"></div>
     <div v-if="isLoading" class="text-gray-500 mt-4">加载中。。。</div>
     <div v-else-if="!hasCharacters" class="text-gray-500 mt-4">没有更多了。。。</div>
   </div>
