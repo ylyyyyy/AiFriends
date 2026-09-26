@@ -35,7 +35,7 @@ async function handleRemoveFriend(){
       emit('remove',props.friendId)
     }
   }catch (err){
-    console.log(err)
+
   }
 }
 
@@ -58,7 +58,7 @@ async function openChatField(){
         chatFieldRef.value.showModal()
       }
     }catch (err){
-      console.log(err)
+
     }
   }
 }

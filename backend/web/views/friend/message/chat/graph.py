@@ -5,7 +5,7 @@ from typing import Sequence,TypedDict, Annotated
 from langchain_core.messages import BaseMessage
 from langchain_openai import ChatOpenAI
 from langgraph.constants import START, END
-from langgraph.graph import add_messages, state, StateGraph
+from langgraph.graph import add_messages, StateGraph
 
 
 class ChatGraph:
@@ -15,13 +15,19 @@ class ChatGraph:
             model = 'qwen3.8-omni-flash',
             openai_api_key = os.getenv('API_KEY'),
             openai_api_base=os.getenv('API_BASE'),
+            streaming=True , # 流式输出
+            model_kwargs = {
+                "stream_options": {
+                    "include_usage": True,  # 输出token消耗数量
+            }
+        }
         )
 
         class AgentState(TypedDict):
             messages:Annotated[Sequence[BaseMessage],add_messages]
 
-        def model_call(sate:AgentState) -> AgentState:
-            res = llm.invoke(state['message'])
+        def model_call(state:AgentState) -> AgentState:
+            res = llm.invoke(state['messages'])
             return {'messages':[res]}
 
         graph = StateGraph(AgentState)
