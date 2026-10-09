@@ -1,14 +1,19 @@
 import os
+from pprint import pprint
 
 from typing import Sequence,TypedDict, Annotated
 
+import lancedb
 from django.utils.timezone import localtime, now
+from langchain_community.vectorstores import LanceDB
 from langchain_core.messages import BaseMessage
 from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
 from langgraph.constants import START, END
 from langgraph.graph import add_messages, StateGraph
 from langgraph.prebuilt import ToolNode
+
+from web.documents.utils.custom_embeddings import CustomEmbeddings
 
 
 class ChatGraph:
@@ -18,7 +23,25 @@ class ChatGraph:
         def get_time() -> str:
             """需要查询当前精确时间的时候，调用此函数。返回格式为：[年-月-日 时:分:秒]"""
             return localtime(now()).strftime('%Y-%m-%d %H:%M:%S')
-        tools = [get_time]
+
+        @tool
+        def search_knowledge_base(query:str) -> str:
+            """当用户查询阿里云百炼平台相关信息的时候，调用此函数。输入为要查询的信息，输出为查询结果"""
+            db = lancedb.connect('./web/documents/lancedb_storage')
+            embeddings = CustomEmbeddings()
+            vector_db = LanceDB(
+                connection=db,
+                embedding=embeddings,
+                table_name='my_knowledge_base',
+            )
+            docs = vector_db.similarity_search(query,k=3)
+            context = '\n\n'.join([f'内容片段：{i+1}\n{doc.page_content}' for i ,doc in enumerate(docs)])
+            return f'从知识库中找到一下相关信息: \n\n{context}\n'
+
+
+
+
+        tools = [get_time,search_knowledge_base]
 
 
         llm = ChatOpenAI(
@@ -37,6 +60,7 @@ class ChatGraph:
             messages:Annotated[Sequence[BaseMessage],add_messages]
 
         def model_call(state:AgentState) -> AgentState:
+            pprint(state['messages'])
             res = llm.invoke(state['messages'])
             return {'messages':[res]}
 
